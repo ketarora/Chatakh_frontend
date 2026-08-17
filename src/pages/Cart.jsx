@@ -1,0 +1,157 @@
+import { useCart } from "../context/CartContext";
+import { Link } from "react-router-dom";
+import CheckoutButton from "../components/CheckoutButton";
+
+// Helper to get correct image URL - Cloudinary URLs are full URLs
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  return `${apiUrl}${imagePath}`;
+};
+
+const Cart = () => {
+  const { cart, removeFromCart } = useCart();
+
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * (item.qty || 1),
+    0
+  );
+
+  const shippingCost = cart.reduce(
+    (sum, item) => sum + (item.shippingCharge || 0),
+    0
+  );
+
+  const total = subtotal + shippingCost;
+
+  if (cart.length === 0) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12 bg-linear-to-br from-[#fffaf6] via-[#fff2e8] to-[#ffe9f3] w-full">
+        <div className="w-full max-w-xl rounded-4xl border border-[#f3c178]/70 bg-white/80 p-8 text-center shadow-[0_20px_60px_-20px_rgba(236,0,128,0.24)] backdrop-blur-xl sm:p-10 md:p-12">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#ffe8f4] text-[#ec0080] sm:h-20 sm:w-20">
+            <svg className="h-8 w-8 sm:h-10 sm:w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+              <circle cx="9" cy="19" r="1.5" fill="currentColor" />
+              <circle cx="17" cy="19" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-[#3f2a24]">Your cart is empty</h2>
+          <p className="text-[#7a5e4f] mb-6 sm:mb-8 text-sm sm:text-base leading-relaxed">
+            Discover our amazing collection and add items to your cart.
+          </p>
+          <Link
+            to="/collections"
+            className="inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 bg-[#ec0080] text-white font-semibold rounded-full hover:bg-[#00aeb2] transition-all duration-300 shadow-lg shadow-[#ec0080]/20 hover:shadow-xl text-sm sm:text-base"
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-800 py-6 sm:py-8 md:py-12 w-full">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 w-full">
+        {/* HEADER */}
+        <div className="mb-6 sm:mb-8 md:mb-12">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 sm:mb-2">Shopping Cart</h1>
+          <p className="text-xs sm:text-sm md:text-base text-gray-400">You have {cart.length} item{cart.length !== 1 ? "s" : ""} in your cart</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* CART ITEMS */}
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+            {cart.map((item) => (
+              <div
+                key={item._id}
+                className="bg-slate-800 border border-slate-700 rounded-lg sm:rounded-2xl p-3 sm:p-4 md:p-6 flex gap-3 sm:gap-4 md:gap-6 shadow-md hover:shadow-lg hover:border-blue-400 transition-all duration-300 group"
+              >
+                {/* IMAGE */}
+                <div className="relative overflow-hidden rounded-lg bg-slate-700 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 shrink-0">
+                  <img
+                    src={
+                      item.images && item.images.length > 0
+                        ? getImageUrl(item.images[0])
+                        : "/placeholder.png"
+                    }
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+
+                {/* INFO */}
+                <div className="flex-1 flex flex-col justify-between min-w-0">
+                  <div>
+                    <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 sm:mb-2 truncate">{item.name}</h3>
+                    <div className="flex gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm text-gray-400 mb-2 sm:mb-3 flex-wrap">
+                      {item.size && (
+                        <span className="bg-slate-700 px-2 sm:px-3 py-1 rounded-lg font-medium border border-slate-600 whitespace-nowrap">
+                          Size: {item.size}
+                        </span>
+                      )}
+                      <span className="bg-slate-700 px-2 sm:px-3 py-1 rounded-lg font-medium border border-slate-600 whitespace-nowrap">
+                        Qty: {item.qty || 1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center gap-2">
+                    <p className="text-lg sm:text-xl md:text-2xl font-bold text-blue-400">₹{item.price * (item.qty || 1)}</p>
+                    <button
+                      onClick={() => removeFromCart(item._id)}
+                      className="px-3 sm:px-4 py-2 bg-red-500/20 text-red-400 font-semibold rounded-lg hover:bg-red-500/30 transition-all duration-300 text-xs sm:text-sm border border-red-500/50 whitespace-nowrap"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* SUMMARY */}
+          <div className="lg:col-span-1">
+            <div className="bg-slate-800 border border-slate-700 rounded-lg sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg sticky top-24">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sm:mb-6">Order Summary</h3>
+
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-slate-700">
+                <div className="flex justify-between text-gray-400 text-xs sm:text-sm md:text-base">
+                  <span>Subtotal</span>
+                  <span>₹{subtotal}</span>
+                </div>
+                <div className="flex justify-between text-gray-400 text-xs sm:text-sm md:text-base">
+                  <span>Shipping</span>
+                  <span className={shippingCost > 0 ? "text-orange-400 font-semibold" : "text-blue-400 font-semibold"}>
+                    {shippingCost > 0 ? `₹${shippingCost}` : "Free"}
+                  </span>
+                </div>
+                <div className="flex justify-between text-gray-400 text-xs sm:text-sm md:text-base">
+                  <span>Tax</span>
+                  <span>Calculated at checkout</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white mb-4 sm:mb-6">
+                <span>Total</span>
+                <span className="text-blue-400">₹{total}</span>
+              </div>
+
+              <CheckoutButton />
+
+              <Link
+                to="/collections"
+                className="block text-center mt-3 sm:mt-4 text-blue-400 font-semibold hover:text-blue-300 transition-colors py-2 sm:py-3 text-sm sm:text-base"
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Cart;

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Debug</title>
+  <style>
+    body { margin: 0; background: #111; color: #fff; font-family: Arial, sans-serif; }
+    .wrap { max-width: 1280px; margin: 20px auto; padding: 12px; }
+    video { width: 100%; height: auto; background: #000; border: 1px solid #333; }
+    .hint { opacity: 0.8; margin-top: 8px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <video id="v" controls preload="metadata">
+      <source src="./20260806-0914-15.2988516.mp4" type="video/mp4" />
+    </video>
+    <div class="hint">Use controls to scrub timestamps.</div>
+  </div>
+</body>
+</html>

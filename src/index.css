@@ -1,0 +1,82 @@
+/* ─── Design Tokens ─── */
+:root {
+  --c-navy:       #0A0E17;
+  --c-navy-light: #131928;
+  --c-rust:       #C45D3E;
+  --c-rust-light: #D4785E;
+  --c-ivory:      #FAF7F2;
+  --c-cream:      #F5F0EB;
+  --c-warm-gray:  #8A8279;
+  --c-gold:       #B8976A;
+
+  --ff-serif: 'Playfair Display', 'Georgia', serif;
+  --ff-sans:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--ff-sans);
+  color: var(--c-navy);
+  background: var(--c-ivory);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+@media (pointer: fine) {
+  body, * {
+    cursor: none !important;
+  }
+}
+
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  background: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+input, textarea, select {
+  font-size: 16px;
+  font-family: inherit;
+}
+
+/* ─── Utility ─── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

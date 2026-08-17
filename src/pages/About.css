@@ -1,0 +1,155 @@
+.about-page {
+  background: var(--ivory, #FAF7F2);
+  color: var(--navy, #0F1621);
+  min-height: 100vh;
+  padding-top: 72px;
+}
+
+.about-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(80px, 12vh, 120px) clamp(16px, 4vw, 48px) clamp(48px, 8vh, 80px);
+  overflow: hidden;
+}
+
+.about-hero-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0F1621 0%, #1a2433 50%, #2a1f1a 100%);
+  z-index: 0;
+}
+
+.about-hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url('/COVER_.png') center / cover no-repeat;
+  opacity: 0.25;
+}
+
+.about-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  color: #fff;
+}
+
+.about-eyebrow {
+  display: block;
+  color: #C45D3E;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.about-hero-content h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.15;
+  margin: 0 0 1.25rem;
+}
+
+.about-hero-content p {
+  opacity: 0.8;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin: 0 0 2rem;
+}
+
+.about-cta {
+  display: inline-block;
+  padding: 14px 32px;
+  background: #fff;
+  color: #0F1621;
+  border-radius: 100px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.about-cta:hover {
+  background: #C45D3E;
+  color: #fff;
+}
+
+.about-body {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vh, 80px) clamp(16px, 4vw, 48px);
+}
+
+.about-chapter {
+  margin-bottom: clamp(32px, 5vh, 48px);
+}
+
+.chapter-num {
+  display: block;
+  color: #C45D3E;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 0.75rem;
+}
+
+.about-chapter p {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #3d4654;
+  margin: 0;
+}
+
+.about-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.about-gallery img {
+  width: 100%;
+  height: clamp(200px, 30vh, 280px);
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.about-closing {
+  text-align: center;
+  padding: clamp(32px, 6vh, 56px) 0;
+  border-top: 1px solid #e0ddd8;
+}
+
+.about-closing h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 0 0 0.75rem;
+}
+
+.about-closing p {
+  color: #8a919c;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.about-instagram {
+  color: #C45D3E;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.about-instagram:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .about-gallery {
+    grid-template-columns: 1fr;
+  }
+}
