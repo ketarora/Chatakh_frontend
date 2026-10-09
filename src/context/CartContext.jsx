@@ -2,40 +2,53 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext();
 
+const lineKey = (p) => `${p._id}__${p.size || "OS"}`;
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem("cart");
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem("cart");
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
 
   // persist cart
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    try {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } catch { /* storage full / private mode */ }
   }, [cart]);
 
   const addToCart = (product) => {
+    const qty = Math.min(10, Math.max(1, product.qty || 1));
     setCart((prevCart) => {
-      const exists = prevCart.find((p) => p._id === product._id);
+      const key = lineKey(product);
+      const exists = prevCart.find((p) => lineKey(p) === key);
 
       if (exists) {
         return prevCart.map((p) =>
-          p._id === product._id
-            ? { ...p, qty: (p.qty || 1) + 1 }
+          lineKey(p) === key
+            ? { ...p, qty: Math.min(10, (p.qty || 1) + qty) }
             : p
         );
       }
 
-      return [...prevCart, { ...product, qty: 1 }];
+      return [...prevCart, { ...product, qty }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCart((prev) => prev.filter((p) => p._id !== id));
+  const removeFromCart = (id, size) => {
+    setCart((prev) =>
+      prev.filter((p) => (size ? lineKey(p) !== `${id}__${size}` : p._id !== id))
+    );
   };
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem("cart");
+    try { localStorage.removeItem("cart"); } catch { /* ignore */ }
   };
 
   return (

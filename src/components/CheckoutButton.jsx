@@ -1,10 +1,19 @@
 import api from "../api/axios";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "@clerk/clerk-react";
+import * as Clerk from "@clerk/clerk-react";
+
+const useSafeAuth = () => {
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return Clerk.useAuth();
+  } catch {
+    return { getToken: async () => null };
+  }
+};
 
 const CheckoutButton = () => {
-  const { getToken } = useAuth();
+  const { getToken } = useSafeAuth();
   const { cart, clearCart } = useCart();
   
   const subtotal = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
@@ -62,7 +71,7 @@ const [error, setError] = useState(null);
         amount: data.amount,
         currency: "INR",
         order_id: data.id,
-        name: "Shikhar Clothing",
+        name: "Chatakh Creations",
         description: `Payment for ${cart.length} item(s)`,
 
         method: {

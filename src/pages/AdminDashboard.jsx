@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
 import api, { setupAxiosInterceptors, makeAuthenticatedRequest } from "../api/axios";
-import { useUser } from "@clerk/clerk-react";
-import { useAuth } from "@clerk/clerk-react";
+import * as Clerk from "@clerk/clerk-react";
 
 const VITE_API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
+const useSafeAdminAuth = () => {
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const auth = Clerk.useAuth();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const userState = Clerk.useUser();
+    return { ...auth, ...userState, clerkLive: true };
+  } catch {
+    return { getToken: async () => null, user: null, isLoaded: true, isSignedIn: false, clerkLive: false };
+  }
+};
+
 const AdminDashboard = () => {
-  const { getToken } = useAuth();
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { getToken, user, isLoaded, isSignedIn, clerkLive } = useSafeAdminAuth();
   const [images, setImages] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [interceptorReady, setInterceptorReady] = useState(false);
@@ -120,6 +130,17 @@ const AdminDashboard = () => {
     console.log("✅ All conditions met, fetching admin data");
     fetchAdminData();
   }, [isLoaded, isSignedIn, user, interceptorReady]);
+
+  if (!clerkLive) {
+    return (
+      <div style={{ minHeight: "70vh", display: "grid", placeItems: "center", background: "#FFF9F2", padding: 24, textAlign: "center" }}>
+        <div>
+          <h2 style={{ fontFamily: "Fraunces, serif" }}>Admin needs sign-in</h2>
+          <p style={{ color: "#8A6B6F" }}>Clerk is unavailable in this preview. Add your Clerk key to open the dashboard.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoaded) return <p>Loading...</p>;
 
@@ -663,7 +684,7 @@ const AdminDashboard = () => {
                         src={
                           p.images && p.images.length > 0
                             ? p.images[0].startsWith('http') ? p.images[0] : `${VITE_API_URL}${p.images[0]}`
-                            : "/placeholder.png"
+                            : "/img1.jpeg"
                         }
                         alt={p.name}
                         className="w-full h-full object-cover"

@@ -2,15 +2,15 @@ import axios from "axios";
 
 // Get base URL from environment or construct from current location
 const getBaseURL = () => {
-  if (import.meta.env.DEV) {
-    return ''; // Route through localhost API proxy directly to bypass restrictive backend CORS
-  }
-
   const envURL = import.meta.env.VITE_API_URL;
   if (envURL && envURL.trim()) {
-    return envURL.trim();
+    return envURL;
   }
-  // Default to production deployment backend to fetch actual products
+  // Fallback for production (if env var not set)
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return "http://localhost:5000";
+  }
+  // For production deployment
   return "https://chatakh-creations.onrender.com";
 };
 
@@ -19,8 +19,32 @@ console.log("✅ API Base URL:", baseURL);
 
 const api = axios.create({
   baseURL,
-  timeout: 15000,
+  // Render free-tier sleeps: first request can take 30-60s to wake it.
+  timeout: 90000,
 });
+
+// Cold-start retry: retry failed GETs (network error / timeout / 5xx) so the
+// site recovers by itself while Render wakes up instead of showing empty.
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+    const status = error.response?.status;
+    const retriable =
+      config &&
+      config.method?.toLowerCase() === "get" &&
+      (!error.response || status >= 500);
+    config.__retries = config.__retries || 0;
+    if (retriable && config.__retries < 3) {
+      config.__retries += 1;
+      const wait = config.__retries * 4000;
+      console.warn(`⏳ Backend waking up… retry ${config.__retries}/3 in ${wait / 1000}s`);
+      await new Promise((r) => setTimeout(r, wait));
+      return api(config);
+    }
+    return Promise.reject(error);
+  }
+);
 
 let interceptorSetup = false;
 let currentGetToken = null;

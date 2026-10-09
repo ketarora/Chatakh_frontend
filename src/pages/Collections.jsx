@@ -1,170 +1,184 @@
-import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
 import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
+import QuickView from "../components/QuickView";
+import NavratriHero, { expandQuery, GarbaBand, DropPreview } from "../components/Navratri";
+import { GridSkeleton } from "../components/Loader";
 
-const mainCollections = [
-  {
-    value: "threads-of-aura",
-    name: "The Threads of Aura",
-    image:
-      "/threads%20of%20aura.png",
-  },
-  {
-    value: "colors-of-aura",
-    name: "The Colors of Aura",
-    image:
-      "/colors%20of%20aura.png",
-  },
+const MAIN = [
+  { value: "threads-of-aura", name: "The Threads of Aura", img: "/house-threads.jpg", fallback: "/threads of aura.png", tag: "Collection" },
+  { value: "colors-of-aura", name: "The Colors of Aura", img: "/house-colors.png", fallback: "/colors of aura.png", tag: "Collection" },
+  { value: "accessories", name: "Accessories", img: "/house-acc.jpg", fallback: "/cat-acc.jpg", tag: "Accessories" },
+  { value: "bandhani", name: "Bandhej - The Sheer Edit", img: "/house-bandhej.jpg", fallback: "/img3.jpeg", tag: "New Launch 🎉" },
+];
+
+const CATS = [
+  { value: "all", label: "All" },
+  { value: "men", label: "Men" },
+  { value: "women", label: "Women" },
+  { value: "couple", label: "Couple" },
+  { value: "accessories", label: "Accessories" },
 ];
 
 const Collections = () => {
   const { mainCollection } = useParams();
-  const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category") || "";
-  const hasSelectedCollection = Boolean(mainCollection);
+  const location = useLocation();
+  // /navratri is its OWN festive page. /collections/colors-of-aura stays a
+  // normal backend-driven collection, exactly like threads-of-aura.
+  const isNavratriPage = location.pathname.startsWith("/navratri");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryParam = searchParams.get("category") || "all";
+  const searchParam = searchParams.get("search") || "";
 
-  const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState(
-    ["men", "women", "couple"].includes(categoryParam) ? categoryParam : "men"
-  );
-  const [loading, setLoading] = useState(false);
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [quickView, setQuickView] = useState(null);
+  const [sort, setSort] = useState("featured");
 
-  const selectedCollection = mainCollections.find((collection) => collection.value === mainCollection);
+  const selected = MAIN.find((c) => c.value === mainCollection);
 
   useEffect(() => {
-    if (!hasSelectedCollection || !selectedCollection) {
-      setProducts([]);
-      return;
+    let alive = true;
+    setLoading(true);
+    // Fetch everything once — then filter client-side so nothing ever "disappears".
+    api.get("/api/products?limit=200")
+      .then((res) => { if (alive) setAllProducts(Array.isArray(res.data) ? res.data : []); })
+      .catch(() => { if (alive) setAllProducts([]); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, []);
+
+  const productsMemo = useMemo(() => {
+    let list = [...allProducts];
+    let collectionFallback = false;
+    if (selected) {
+      const inCollection = list.filter((p) => (p.mainCollection || "").toLowerCase() === selected.value);
+      // Never show a dead-end: if this collection has no pieces yet, show
+      // everything with a note instead of an empty page.
+      if (inCollection.length) list = inCollection;
+      else collectionFallback = true;
     }
+    // Navratri mode sells everything too — no day-wise filtering, ever.
+    if (categoryParam === "accessories") {
+      const matches = list.filter((p) =>
+        `${p.subcategory || ""} ${p.name || ""} ${p.description || ""}`.toLowerCase().includes("accessor")
+      );
+      // Never show a dead-end: if no accessories exist yet, show everything.
+      list = matches.length ? matches : list;
+    } else if (categoryParam !== "all") {
+      list = list.filter((p) => (p.category || "").toLowerCase() === categoryParam);
+    }
+    if (searchParam) {
+      // Colour-aware search: "red" also matches maroon/laal, "peacock" matches teal…
+      // Every typed word must hit (with its colour family) — no loose OR spam.
+      const groups = expandQuery(searchParam);
+      list = list.filter((p) => {
+        const hay = `${p.name} ${p.description} ${p.category} ${p.subcategory || ""}`.toLowerCase();
+        return groups.every((family) => family.some((w) => hay.includes(w)));
+      });
+    }
+    return { list, collectionFallback };
+  }, [allProducts, selected, categoryParam, searchParam]);
 
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const url = `/api/products?mainCollection=${selectedCollection.value}&category=${category}`;
+  const sorted = useMemo(() => {
+    const arr = [...productsMemo.list];
+    if (sort === "price-low") arr.sort((a, b) => (a.price || 0) - (b.price || 0));
+    else if (sort === "price-high") arr.sort((a, b) => (b.price || 0) - (a.price || 0));
+    else if (sort === "name") arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    return arr;
+  }, [productsMemo.list, sort]);
 
-        const res = await api.get(url);
-        // Seamless backend proxy connection bypass array destructuring
-        const fetchedData = res.data?.products || res.data || [];
-        setProducts(Array.isArray(fetchedData) ? fetchedData : []);
-      } catch (err) {
-        console.error("COLLECTION FETCH ERROR:", err);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const products = sorted;
+  const collectionFallback = productsMemo.collectionFallback;
 
-    fetchProducts();
-  }, [hasSelectedCollection, selectedCollection, category]);
-
-  const categoryOptions = [
-    { value: "men", label: "Man" },
-    { value: "women", label: "Woman" },
-    { value: "couple", label: "Couple" },
-  ];
+  const setCat = (v) => {
+    const next = new URLSearchParams(searchParams);
+    if (v === "all") next.delete("category"); else next.set("category", v);
+    setSearchParams(next);
+  };
 
   return (
-    <div 
-      className="w-full text-[#3f2a24] font-sans"
-      style={{ backgroundColor: '#fffaf6', minHeight: '100vh', marginTop: '80px', paddingBottom: '80px' }}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-6 w-full">
-        {/* HEADER BANNER - Perfectly encapsulated in centered container */}
-        <div 
-          className="relative overflow-hidden text-[#fff6e9] pt-16 pb-12 px-6 w-full rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)]"
-          style={{ 
-            background: 'linear-gradient(135deg, #1d1d1d 0%, #4b1930 50%, #ec0080 100%)' 
-          }}
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.16),transparent_35%)]"></div>
-          <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
-          
-          <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
-            <div className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-[#ffe8f4] backdrop-blur-sm mb-6">
-              Modern Fashion Edit
-            </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-white mb-4 tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
-              {selectedCollection ? selectedCollection.name : "Collections"}
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl text-center leading-relaxed font-light drop-shadow-sm">
-              A refined selection of pristine outfits designed for effortless confidence, statement styling, and everyday luxury.
-            </p>
-          </div>
+    <div className="collections">
+      {isNavratriPage ? (
+        <NavratriHero
+          onCelebrate={() => document.getElementById("nav-grid")?.scrollIntoView({ behavior: "smooth" })}
+        />
+      ) : (
+        <div className="coll-hero">
+          <p className="eyebrow light">{selected ? "✦ Signature edit" : "✦ The full wardrobe"}</p>
+          <h1>{selected ? selected.name : "Collections"}</h1>
+          <p>{allProducts.length} pieces · {searchParam ? `matching “${searchParam}”` : "handcrafted & ready to ship"}</p>
         </div>
-        
-        {/* CENTERED EDITORIAL TEXT */}
-        <div className="mb-10 mt-14 max-w-4xl mx-auto text-center flex flex-col items-center justify-center">
-          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#ec0080] mb-4">Signature Edit</p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#2a1b16] leading-tight tracking-tight mb-6">
-            Elevated essentials for the modern wardrobe.
-          </h2>
-          <div className="w-16 h-px bg-[#d2c5bb] mb-6"></div>
-          <p className="text-sm sm:text-base md:text-lg text-[#5a4239] leading-relaxed font-light max-w-2xl">
-            Discover beautifully curated pieces that blend premium textures, contemporary comfort, and expressive detailing into one sophisticated edit.
-          </p>
-        </div>
+      )}
 
-        {/* CONTROLS: Back + Filters */}
-        <div className="w-full flex flex-col items-center justify-center gap-6 mb-16">
-          
-          {hasSelectedCollection && selectedCollection && (
-            <Link
-              to="/collections"
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase border border-[#d2c5bb] text-[#3f2a24] bg-transparent hover:bg-[#3f2a24] hover:text-[#FAF7F2] transition-colors shadow-sm"
-            >
-              <span aria-hidden="true" className="text-sm leading-none -mt-0.5">←</span>
-              Back to Collections
+      {isNavratriPage && <DropPreview onQuickView={setQuickView} />}
+
+      {!selected && !isNavratriPage && (
+        <div className="coll-cards">
+          {MAIN.map((c) => (
+            <Link key={c.value} to={c.to || `/collections/${c.value}`} className="coll-card">
+              <img src={c.img} alt={c.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = c.fallback || "/img2.jpeg"; }} />
+              <span className="coll-badge">{c.tag}</span>
+              <div className="coll-card-cap"><b>{c.name}</b><span>Explore →</span></div>
             </Link>
-          )}
-
-          {/* HIGH CONTRAST VISIBLE & UNIFORM GENDER BUTTONS */}
-          {hasSelectedCollection && selectedCollection && (
-            <div 
-              className="inline-flex bg-[#fffdf8] p-1.5 rounded-full shadow-inner border border-[#d2c5bb] gap-1"
-            >
-              {categoryOptions.map((option) => {
-                const isActive = category === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    onClick={() => setCategory(option.value)}
-                    className={`rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all duration-300 w-24 sm:w-32 h-10 sm:h-12 flex items-center justify-center ${isActive ? "shadow-md" : "hover:bg-[#e8d5c4]/30"}`}
-                    style={isActive ? { backgroundColor: '#1d1512', color: '#ffffff' } : { color: '#8a6b57' }}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          ))}
         </div>
+      )}
 
-        {/* PRODUCTS GRID */}
-        {!hasSelectedCollection ? null : !selectedCollection ? null : loading ? (
-          <div className="flex justify-center items-center py-16">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 w-full animate-pulse">
-               <div className="h-80 bg-[#e8d5c4]/30 rounded-3xl w-full"></div>
-               <div className="h-80 bg-[#e8d5c4]/30 rounded-3xl w-full hidden sm:block"></div>
-               <div className="h-80 bg-[#e8d5c4]/30 rounded-3xl w-full hidden md:block"></div>
-               <div className="h-80 bg-[#e8d5c4]/30 rounded-3xl w-full hidden lg:block"></div>
-            </div>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="rounded-[3rem] border border-[#f3c178]/60 bg-white shadow-xl px-4 py-20 text-center sm:px-6">
-            <p className="text-xl sm:text-2xl text-[#2a1b16] font-bold font-serif">
-              No pieces available in this section.
-            </p>
-            <p className="text-[#8a6b57] mt-3 text-sm tracking-wide">Check back soon for our newest drops.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-            {products.map((p) => (
-              <ProductCard key={p._id} product={p} />
-            ))}
-          </div>
-        )}
+      <div className="coll-filters">
+        {CATS.map((c) => (
+          <button key={c.value} className={categoryParam === c.value || (c.value === "all" && !searchParams.get("category")) ? "on" : ""} onClick={() => setCat(c.value)}>
+            {c.label}
+          </button>
+        ))}
       </div>
+
+      <div className="coll-tools">
+        <p className="coll-count">{!loading && `${products.length} piece${products.length === 1 ? "" : "s"}`}</p>
+        <label className="sort-wrap">
+          Sort
+          <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort products">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: low → high</option>
+            <option value="price-high">Price: high → low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
+      </div>
+
+      {selected && (
+        <Link to="/collections" className="back-link">← Back to Collections</Link>
+      )}
+
+      {!loading && collectionFallback && products.length > 0 && (
+        <p className="fallback-note">❀ Fresh pieces for <b>{selected?.name}</b> are being stitched — meanwhile, here's everything we have →</p>
+      )}
+
+      {loading ? (
+        <div className="section"><GridSkeleton count={8} /></div>
+      ) : products.length === 0 ? (
+        <div className="empty-box">
+          <p className="empty-face">(◕‿◕)</p>
+          <h3>Nothing here yet…</h3>
+          <p>Try a different category — or be the first to ask for it on Instagram.</p>
+          <Link to="/collections" className="btn-primary">See everything →</Link>
+        </div>
+      ) : (
+        <div className="masonry pad" id="nav-grid">
+          {products.map((p, i) => (
+            <div key={p._id + i} className="masonry-item" style={{ "--d": `${(i % 10) * 60}ms` }}>
+              <ProductCard product={p} onQuickView={setQuickView} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {quickView && <QuickView product={quickView} onClose={() => setQuickView(null)} />}
+
+      {isNavratriPage && !loading && products.length > 0 && (
+        <GarbaBand onShop={() => document.getElementById("nav-grid")?.scrollIntoView({ behavior: "smooth" })} />
+      )}
     </div>
   );
 };

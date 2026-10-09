@@ -1,51 +1,61 @@
 import { useNavigate } from "react-router-dom";
-import { getProductImage } from "../utils/images";
-import "./ProductCard.css";
+import { useWishlist } from "../context/WishlistContext";
+import { getProductImage } from "../utils/image";
+import { useTilt } from "../hooks/useReveal";
 
-const ProductCard = ({ product, index = 0 }) => {
+const ProductCard = ({ product, onQuickView }) => {
   const navigate = useNavigate();
-
+  const { toggleWishlist, isWished } = useWishlist();
+  const tiltRef = useTilt(7);
   if (!product) return null;
 
-  const imageUrl = getProductImage(product);
-  // Pinterest-style varied heights: cycle through aspect ratios
-  const ratios = ["ratio-a", "ratio-b", "ratio-a", "ratio-c", "ratio-b", "ratio-c"];
-  const ratioClass = ratios[index % ratios.length];
+  const wished = isWished(product._id);
+  const img = getProductImage(product);
+  const open = () => navigate(`/product/${product._id}`);
 
   return (
-    <div
-      className={`product-card-component group ${ratioClass}`}
-      onClick={() => navigate(`/product/${product._id}`)}
-      onKeyDown={(e) => e.key === "Enter" && navigate(`/product/${product._id}`)}
+    <article
+      ref={tiltRef}
+      className="pin-card"
       role="button"
       tabIndex={0}
+      aria-label={`View ${product.name}`}
+      onClick={open}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}
     >
-      <div className="pc-image-wrap">
-        <img src={imageUrl} alt={product.name} loading="lazy" />
-        <span className="pc-badge">New Drop</span>
-      </div>
-
-      <div className="pc-body">
-        <h3>{product.name}</h3>
-        {product.description && (
-          <p className="pc-desc">{product.description}</p>
-        )}
-        <div className="pc-footer">
-          <span className="pc-price">₹{product.price}</span>
-          <span className="pc-status">Available</span>
+      <div className="pin-media">
+        <img src={img} alt={product.name} loading="lazy" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
+        <span className="pin-shine" />
+        <div className="pin-top">
+          <span className="pin-chip">{product.category || "New Drop"}</span>
+          <button
+            className={`pin-save ${wished ? "saved" : ""}`}
+            aria-label="Save to wishlist"
+            onClick={(e) => { e.stopPropagation(); toggleWishlist(product); }}
+          >
+            {wished ? "♥ Saved" : "♡ Save"}
+          </button>
         </div>
-        <button
-          type="button"
-          className="pc-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/product/${product._id}`);
-          }}
-        >
-          View Details
-        </button>
+        <div className="pin-hover">
+          <button
+            className="pin-btn ghost"
+            onClick={(e) => { e.stopPropagation(); onQuickView ? onQuickView(product) : navigate(`/product/${product._id}`); }}
+          >
+            👁 Quick view
+          </button>
+          <button className="pin-btn solid" onClick={(e) => { e.stopPropagation(); navigate(`/product/${product._id}`); }}>
+            Shop →
+          </button>
+        </div>
+        {product.price != null && (
+          <span className="pin-price">₹{product.price}</span>
+        )}
       </div>
-    </div>
+      <div className="pin-body">
+        <h3>{product.name}</h3>
+        {product.description && <p>{product.description}</p>}
+      </div>
+    </article>
   );
 };
 
