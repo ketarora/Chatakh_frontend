@@ -15,6 +15,9 @@ const useSafeAuth = () => {
 const CheckoutButton = () => {
   const { getToken } = useSafeAuth();
   const { cart, clearCart } = useCart();
+  // Catalogue mode: no Razorpay key yet → take orders via Instagram DM instead
+  // of showing a broken Pay button. Flip on automatically when the key lands.
+  const paymentsLive = Boolean(import.meta.env.VITE_RAZORPAY_KEY);
   
   const subtotal = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
   const shippingCost = cart.reduce(
@@ -143,6 +146,28 @@ const [error, setError] = useState(null);
     const { name, value } = e.target;
     setAddress({ ...address, [name]: value });
   };
+
+  // Catalogue mode: order via DM until Razorpay keys land.
+  if (!paymentsLive) {
+    return (
+      <div className="w-full rounded-2xl p-[1px] bg-gradient-to-r from-[#ec0080] to-[#ffb300]">
+        <div className="rounded-2xl bg-[#2B1A1E] p-6 text-center">
+          <p className="text-lg font-bold text-white mb-1">Online payments switching on soon ✦</p>
+          <p className="text-sm text-[#F3D9E4] mb-4">
+            Bag total ₹{total} — screenshot your bag & DM us to order today.
+          </p>
+          <a
+            href="https://www.instagram.com/chatakh_"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center px-6 py-3 bg-[#ec0080] text-white font-bold rounded-full hover:bg-[#ffb300] hover:text-[#2B1A1E] transition-all duration-300 text-sm"
+          >
+            Order on DM ◍
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
