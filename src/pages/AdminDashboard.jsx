@@ -40,6 +40,8 @@ const AdminDashboard = () => {
   const mainCollectionOptions = [
     { value: "threads-of-aura", label: "The Threads of Aura" },
     { value: "colors-of-aura", label: "The Colors of Aura" },
+    { value: "accessories", label: "Accessories" },
+    { value: "bandhani", label: "Bandhej - The Sheer Edit" },
   ];
 
   // Define subcategories for each category
@@ -49,17 +51,20 @@ const AdminDashboard = () => {
       { value: "pants", label: "Pants" },
       { value: "tshirts", label: "T-Shirts" },
       { value: "shorts", label: "Shorts" },
+      { value: "accessories", label: "Accessories" },
     ],
     women: [
       { value: "tops", label: "Tops" },
       { value: "dresses", label: "Dresses" },
       { value: "skirts", label: "Skirts" },
       { value: "leggings", label: "Leggings" },
+      { value: "accessories", label: "Accessories" },
     ],
     couple: [
       { value: "matching-sets", label: "Matching Sets" },
       { value: "couple-tees", label: "Couple T-Shirts" },
       { value: "couple-outfits", label: "Couple Outfits" },
+      { value: "accessories", label: "Accessories" },
     ],
   };
 
