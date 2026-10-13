@@ -59,7 +59,10 @@ const Collections = () => {
       if (inCollection.length) list = inCollection;
       else collectionFallback = true;
     }
-    // Navratri mode sells everything too — no day-wise filtering, ever.
+    // Navratri page shows ONLY navratri collection — nothing else, ever.
+    if (isNavratriPage) {
+      list = list.filter((p) => (p.mainCollection || "").toLowerCase() === "navratri");
+    }
     if (categoryParam === "accessories") {
       const matches = list.filter((p) =>
         `${p.subcategory || ""} ${p.name || ""} ${p.description || ""}`.toLowerCase().includes("accessor")
@@ -112,8 +115,6 @@ const Collections = () => {
         </div>
       )}
 
-      {isNavratriPage && <DropPreview onQuickView={setQuickView} />}
-
       {!selected && !isNavratriPage && (
         <div className="coll-cards">
           {MAIN.map((c) => (
@@ -158,12 +159,19 @@ const Collections = () => {
       {loading ? (
         <div className="section"><GridSkeleton count={8} /></div>
       ) : products.length === 0 ? (
-        <div className="empty-box">
-          <p className="empty-face">(◕‿◕)</p>
-          <h3>Nothing here yet…</h3>
-          <p>Try a different category — or be the first to ask for it on Instagram.</p>
-          <Link to="/collections" className="btn-primary">See everything →</Link>
-        </div>
+        isNavratriPage ? (
+          <>
+            <DropPreview onQuickView={setQuickView} />
+            <p className="fallback-note">❀ Real Navratri pieces drop soon — meanwhile, <Link to="/collections">browse everything →</Link></p>
+          </>
+        ) : (
+          <div className="empty-box">
+            <p className="empty-face">(◕‿◕)</p>
+            <h3>Nothing here yet…</h3>
+            <p>Try a different category — or be the first to ask for it on Instagram.</p>
+            <Link to="/collections" className="btn-primary">See everything →</Link>
+          </div>
+        )
       ) : (
         <div className="masonry pad" id="nav-grid">
           {products.map((p, i) => (

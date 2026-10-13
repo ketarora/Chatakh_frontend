@@ -42,6 +42,7 @@ const AdminDashboard = () => {
     { value: "colors-of-aura", label: "The Colors of Aura" },
     { value: "accessories", label: "Accessories" },
     { value: "bandhani", label: "Bandhej - The Sheer Edit" },
+    { value: "navratri", label: "Navratri Edit" },
   ];
 
   // Define subcategories for each category

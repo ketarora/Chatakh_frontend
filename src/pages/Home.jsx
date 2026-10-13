@@ -80,7 +80,7 @@ const Hero = () => {
 };
 
 /* ---------------- FEATURED: image-changing animation ---------------- */
-const Featured = ({ products, onQuickView }) => {
+const Featured = ({ products, link, onQuickView }) => {
   const [tick, setTick] = useState(0);
   const [paused, setPaused] = useState(false);
   const [ref, visible] = useReveal();
@@ -143,7 +143,7 @@ const Featured = ({ products, onQuickView }) => {
       </div>
 
       <div className="feat-pill-row">
-        <Link to="/collections/colors-of-aura" className="feat-pill">{activeName} →</Link>
+        <Link to={link || "/collections/threads-of-aura"} className="feat-pill">{activeName} →</Link>
       </div>
     </section>
   );
@@ -379,10 +379,13 @@ const Home = () => {
   }, []);
 
   const featured = useMemo(() => {
-    // Navratri focus: show Colors of Aura the moment it has products,
-    // otherwise Threads picks (backend-driven in both cases).
-    const colors = products.filter((p) => (p.mainCollection || "").toLowerCase() === "colors-of-aura");
-    return colors.length ? colors.slice(0, 8) : products.slice(0, 8);
+    // Prime focus order: Navratri → Colors → everything (all backend-driven).
+    const by = (v) => products.filter((p) => (p.mainCollection || "").toLowerCase() === v);
+    const nav = by("navratri");
+    if (nav.length) return { items: nav.slice(0, 8), to: "/navratri" };
+    const colors = by("colors-of-aura");
+    if (colors.length) return { items: colors.slice(0, 8), to: "/collections/colors-of-aura" };
+    return { items: products.slice(0, 8), to: "/collections/threads-of-aura" };
   }, [products]);
 
   return (
@@ -392,7 +395,7 @@ const Home = () => {
       {loading ? (
         <section className="section"><GridSkeleton count={4} /></section>
       ) : (
-        <Featured products={featured} onQuickView={setQuickView} />
+        <Featured products={featured.items} link={featured.to} onQuickView={setQuickView} />
       )}
 
       <AuraBanner />
