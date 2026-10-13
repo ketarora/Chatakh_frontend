@@ -379,12 +379,19 @@ const Home = () => {
   }, []);
 
   const featured = useMemo(() => {
-    // Prime focus order: Navratri → Colors → everything (all backend-driven).
-    const by = (v) => products.filter((p) => (p.mainCollection || "").toLowerCase() === v);
+    // Prime focus: Navratri → Colors. Never Threads of Aura.
+    // Slug-normalized so "Colors of Aura", "colors-of-aura", "the_colors_of_aura" all match.
+    const slug = (v) => (v || "").toString().toLowerCase().replace(/^the[\s-]+/, "").replace(/[\s_]+/g, "-").trim();
+    const by = (s) => products.filter((p) => slug(p.mainCollection) === s);
+    const notThreads = (p) => slug(p.mainCollection) !== "threads-of-aura";
     const nav = by("navratri");
     if (nav.length) return { items: nav.slice(0, 8), to: "/navratri" };
     const colors = by("colors-of-aura");
     if (colors.length) return { items: colors.slice(0, 8), to: "/collections/colors-of-aura" };
+    const festive = products.filter((p) => notThreads(p) && /navratri|garba|dandiya|festive/i.test(`${p.name} ${p.description} ${p.subcategory || ""}`));
+    if (festive.length) return { items: festive.slice(0, 8), to: "/collections/colors-of-aura" };
+    const rest = products.filter(notThreads);
+    if (rest.length) return { items: rest.slice(0, 8), to: "/collections" };
     return { items: products.slice(0, 8), to: "/collections/threads-of-aura" };
   }, [products]);
 
