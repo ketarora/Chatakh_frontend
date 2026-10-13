@@ -681,3 +681,133 @@ button.cd-strip:hover { transform: translateY(-2px); background: var(--nc, var(-
   .marquee-track, .announce-track, .ribbon-track, .ticker-track { animation: none !important; }
   html { scroll-behavior: auto; }
 }
+/* =====================================================================
+   MOBILE POLISH — everything centred, nothing clipped (<= 900 / 560 / 380)
+   Keep this block at the very END of App.css so it wins over earlier rules.
+   ===================================================================== */
+html, body { max-width: 100%; overflow-x: clip; }
+.home { overflow-x: clip; }
+
+/* ---------- NAVBAR: fit logo + icons in one row on phones ---------- */
+@media (max-width: 900px) {
+  .pill-wrap { padding: 8px 10px 0; }
+  .pill-bar { gap: 6px; padding: 6px 8px 6px 12px; }
+  .pill-logo img { height: 32px; }
+  .pill-search { margin-left: auto; }
+  .pill-icons { gap: 0; }
+  .circle-btn { width: 40px; padding: 6px 0; }
+  .circle-btn small { display: none; }              /* labels were the overflow culprit */
+  .circle-btn svg { width: 22px; height: 22px; }
+  .badge { right: 2px; top: 0; }
+  .pill-drop { margin: 8px 0 0; }
+  .pill-drop .pill-link { text-align: center; }
+}
+
+/* ---------- HERO: stacked + perfectly centred ---------- */
+@media (max-width: 900px) {
+  .hero-split { border-radius: 0 0 28px 28px; min-height: 0; }
+  .hs-text { align-items: center; text-align: center; padding: 40px 20px 44px; }
+  .hero-kicker { align-self: center; justify-content: center; text-align: center; font-size: 10.5px; letter-spacing: .1em; line-height: 1.5; padding: 10px 16px; border-radius: 20px; max-width: 100%; }
+  .hs-title { font-size: clamp(40px, 13.2vw, 76px); line-height: 1; width: 100%; }
+  .hs-title .line { white-space: nowrap; }          /* "STAND OUT!!" never wraps / never gets clipped */
+  .hs-sub { margin: 18px auto 24px; font-size: 15px; max-width: 34ch; }
+  .hero-ctas { justify-content: center; width: 100%; }
+  .hero-ctas .btn-primary, .hero-ctas .btn-outline { justify-content: center; }
+  .hs-meta { flex-wrap: wrap; justify-content: center; gap: 8px 18px; text-align: center; }
+  .hs-photo { min-height: 56vh; }
+  .hs-photo-inner { inset: -4% 0; }
+  .scroll-cue { right: auto; left: 50%; transform: translateX(-50%); bottom: 16px; }
+}
+@media (max-width: 560px) {
+  .hero-ctas { flex-direction: column; align-items: stretch; max-width: 320px; margin: 0 auto; }
+  .hero-sticker { font-size: 11px; padding: 8px 14px; }
+  .hero-sticker.s1 { top: 16px; right: 12px; }
+  .hero-sticker.s2 { top: 62px; left: 12px; }
+}
+
+/* ---------- GLOBAL SECTION RHYTHM ---------- */
+@media (max-width: 560px) {
+  .section { padding: 56px 16px 12px; }
+  .sec-head { margin-bottom: 28px; }
+  .sec-head h2 { line-height: 1.08; }
+  .eyebrow { letter-spacing: .16em; font-size: 11px; }
+}
+
+/* ---------- FEATURED: one hero card, centred (3 stacked cards looked broken) ---------- */
+@media (max-width: 800px) {
+  .feat-stage { grid-template-columns: 1fr; justify-items: center; }
+  .feat-card.pos-0, .feat-card.pos-2 { display: none; }
+  .feat-card.pos-1 { display: block; width: min(100%, 340px); height: 430px; transform: none; margin: 0 auto; }
+  .feat-dots { bottom: -26px; }
+  .feat-pill-row { margin-top: 48px; }
+  .feat-pill { max-width: 100%; box-sizing: border-box; padding: 12px 22px; }
+}
+
+/* ---------- AURA ---------- */
+@media (max-width: 860px) {
+  .aura-grid { padding: 24px 18px; gap: 26px; border-radius: 26px; }
+  .aura-copy { text-align: center; }
+  .aura-swatches { flex-wrap: wrap; justify-content: center; }   /* 9 dots overflowed the card */
+  .aura-media img { height: 280px; }
+}
+
+/* ---------- STORY ---------- */
+@media (max-width: 860px) {
+  .story-grid { gap: 34px; }
+  .story-copy { text-align: center; }
+  .story-friends { justify-content: center; }
+  .trio-frame { margin: 0 8px; padding: 12px 12px 14px; }
+  .trio-cap { margin-bottom: 64px; }   /* keep badge clearance — do not shrink */
+}
+@media (max-width: 560px) {
+  .trio-doodle { left: 6px; top: 8px; font-size: 17px; }
+  .story-badge { right: 50%; transform: translateX(50%) rotate(3deg); white-space: nowrap; font-size: 12px; padding: 10px 16px; }
+}
+
+/* ---------- INSTAGRAM + CATEGORIES bands ---------- */
+@media (max-width: 560px) {
+  .insta { margin: 48px 10px 0; padding: 48px 0 44px; border-radius: 28px; }
+  .insta-tile { width: 170px; height: 220px; }
+  .cats { margin: 48px 10px 0; padding: 48px 14px; border-radius: 28px; }
+  .cat-card { text-align: center; }
+  .cat-media { height: 240px; }
+}
+
+/* ---------- HOUSE arches: centred column ---------- */
+@media (max-width: 760px) {
+  .arch-row { gap: 40px; padding: 0 8px; }
+  .arch-cap b { font-size: 21px; }
+}
+
+/* ---------- WALL cards: chip + save button were overlapping in 2 columns ---------- */
+@media (max-width: 560px) {
+  .pin-top { top: 8px; left: 8px; right: 8px; gap: 6px; }
+  .pin-chip { font-size: 10px; padding: 5px 8px; max-width: 58%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pin-save { font-size: 11px; padding: 7px 10px; }
+  .pin-price { font-size: 12px; padding: 5px 10px; left: 8px; bottom: 8px; }
+  .pin-body { padding: 10px 12px 14px; }
+  .pin-body h3 { font-size: 14px; }
+  .pin-body p { font-size: 12px; }
+}
+
+/* ---------- PROMISE band ---------- */
+@media (max-width: 820px) {
+  .promise-band { padding: 44px 20px 48px; border-radius: 28px; }
+  .promise-sticker { position: static; display: inline-block; margin: 26px 0 0; transform: rotate(-3deg); }
+  .promise-row { text-align: center; }
+  .promise-item { padding-left: 0; padding-right: 0; }
+  .btn-big { display: flex; justify-content: center; margin: 22px auto 0; padding: 16px 30px; font-size: 16px; max-width: 320px; }
+}
+
+/* ---------- FOOTER: centred on phones ---------- */
+@media (max-width: 560px) {
+  .footer-grid { text-align: center; justify-items: center; padding: 40px 20px 24px; }
+}
+
+/* ---------- very small phones (iPhone SE / 320-360) ---------- */
+@media (max-width: 380px) {
+  .hs-title { font-size: 40px; }
+  .hero-kicker { font-size: 10px; letter-spacing: .06em; }
+  .feat-card.pos-1 { height: 380px; }
+  .masonry { gap: 10px; }
+}
