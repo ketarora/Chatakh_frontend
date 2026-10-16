@@ -24,6 +24,10 @@ export default function Login() {
         <h1>Welcome back, gorgeous</h1>
         <p>Sign in to track orders, save loves & checkout faster.</p>
         <SignIn
+          routing="path"
+          path="/login"
+          signUpUrl="/register"
+          fallbackRedirectUrl="/"
           appearance={{
             elements: {
               rootBox: "w-full",

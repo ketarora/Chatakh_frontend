@@ -24,6 +24,10 @@ export default function Register() {
         <h1>Join the Chatakh club</h1>
         <p>Drops first, secret sales, faster checkout. Free forever.</p>
         <SignUp
+          routing="path"
+          path="/register"
+          signInUrl="/login"
+          fallbackRedirectUrl="/"
           appearance={{
             elements: {
               rootBox: "w-full",
