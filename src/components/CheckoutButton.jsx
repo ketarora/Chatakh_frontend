@@ -42,6 +42,14 @@ const [error, setError] = useState(null);
         setError("Please fill all address fields");
         return;
       }
+      if (!/^[6-9]\d{9}$/.test(address.phone.trim())) {
+        setError("Enter a valid 10-digit mobile number (starting 6–9)");
+        return;
+      }
+      if (!/^\d{6}$/.test(address.pincode.trim())) {
+        setError("Enter a valid 6-digit pincode");
+        return;
+      }
 
       setIsLoading(true);
       console.log("💳 Initiating payment for amount:", total);

@@ -1,7 +1,82 @@
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import CheckoutButton from "../components/CheckoutButton";
 import { getImageUrl } from "../utils/image";
+
+// Real pincode lookup (India Post, free, no key): type 6 digits →
+// pick your post office from the menu, see district + state + ETA.
+const PincodeChecker = () => {
+  const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [offices, setOffices] = useState([]);
+  const [office, setOffice] = useState("");
+  const [error, setError] = useState(null);
+  const [checked, setChecked] = useState(false);
+
+  const check = async (e) => {
+    e?.preventDefault();
+    const v = pin.trim();
+    if (!/^\d{6}$/.test(v)) {
+      setError("6-digit pincode dalo");
+      setOffices([]);
+      setChecked(true);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setChecked(true);
+    try {
+      const r = await fetch(`https://api.postalpincode.in/pincode/${v}`);
+      const j = await r.json();
+      const list = j?.[0]?.PostOffice || [];
+      if (j?.[0]?.Status === "Success" && list.length) {
+        setOffices(list);
+        setOffice(list[0].Name);
+      } else {
+        setOffices([]);
+        setError("Is pincode par delivery nahi milti — pincode check karo");
+      }
+    } catch {
+      setOffices([]);
+      setError("Network hiccup — dobara try karo");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ship-progress">
+      <p>📍 <b>Delivery check</b> — pincode dalo, sahi location chuno</p>
+      <form className="pin-row" onSubmit={check}>
+        <input
+          value={pin}
+          onChange={(e) => { setPin(e.target.value.replace(/\D/g, "").slice(0, 6)); setChecked(false); setOffices([]); setError(null); }}
+          placeholder="e.g. 110001"
+          inputMode="numeric"
+          aria-label="Delivery pincode"
+        />
+        <button type="submit">{loading ? "…" : "Check"}</button>
+      </form>
+      {error && <p className="pin-err">{error}</p>}
+      {offices.length > 0 && (
+        <div className="pin-result">
+          <select value={office} onChange={(e) => setOffice(e.target.value)} aria-label="Post office">
+            {offices.map((o) => (
+              <option key={o.Name + o.BranchType} value={o.Name}>
+                {o.Name} ({o.BranchType})
+              </option>
+            ))}
+          </select>
+          <p>
+            {offices[0].District}, {offices[0].State} — yahan delivery hoti hai ✦
+            <br />Pahunchne me ~3–6 din (indicative)
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Cart = () => {
   const { cart, removeFromCart } = useCart();
@@ -47,6 +122,7 @@ const Cart = () => {
           <div className="sum-row"><span>Subtotal</span><span>₹{subtotal}</span></div>
           <div className="sum-row"><span>Shipping</span><span>{shipping > 0 ? `₹${shipping}` : "Free ✦"}</span></div>
           <div className="sum-total"><span>Total</span><span>₹{subtotal + shipping}</span></div>
+          <PincodeChecker />
           <div className="ship-progress">
             {subtotal >= 999 ? (
               <p>✦ FREE shipping unlocked!</p>
