@@ -46,6 +46,16 @@ const [error, setError] = useState(null);
       setIsLoading(true);
       console.log("💳 Initiating payment for amount:", total);
 
+      // Auth gate: backend records the order against your login. Without a
+      // session token it answers 401 "Not authenticated" — catch it here
+      // with a human message instead of a cryptic error.
+      const sessionToken = await getToken().catch(() => null);
+      if (!sessionToken) {
+        setError("Please login to pay — your bag is saved, sign in and hit Pay again →");
+        setIsLoading(false);
+        return;
+      }
+
       // Use interceptor - no need to pass token manually
       const { data } = await api.post("/api/payment/create", { amount: total });
 
