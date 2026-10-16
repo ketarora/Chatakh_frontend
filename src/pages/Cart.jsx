@@ -32,7 +32,8 @@ const PincodeChecker = () => {
       const list = j?.[0]?.PostOffice || [];
       if (j?.[0]?.Status === "Success" && list.length) {
         setOffices(list);
-        setOffice(list[0].Name);
+        const firstDeliverable = list.find((o) => o.DeliveryStatus === "Delivery") || list[0];
+        setOffice(firstDeliverable.Name);
       } else {
         setOffices([]);
         setError("Is pincode par delivery nahi milti — pincode check karo");
@@ -59,21 +60,25 @@ const PincodeChecker = () => {
         <button type="submit">{loading ? "…" : "Check"}</button>
       </form>
       {error && <p className="pin-err">{error}</p>}
-      {offices.length > 0 && (
-        <div className="pin-result">
-          <select value={office} onChange={(e) => setOffice(e.target.value)} aria-label="Post office">
-            {offices.map((o) => (
-              <option key={o.Name + o.BranchType} value={o.Name}>
-                {o.Name} ({o.BranchType})
-              </option>
-            ))}
-          </select>
-          <p>
-            {offices[0].District}, {offices[0].State} — yahan delivery hoti hai ✦
-            <br />Pahunchne me ~3–6 din (indicative)
-          </p>
-        </div>
-      )}
+      {offices.length > 0 && (() => {
+        const sel = offices.find((o) => o.Name === office) || offices[0];
+        const delivers = sel.DeliveryStatus === "Delivery";
+        return (
+          <div className="pin-result">
+            <select value={office} onChange={(e) => setOffice(e.target.value)} aria-label="Post office">
+              {offices.map((o) => (
+                <option key={o.Name + o.BranchType} value={o.Name}>
+                  {o.Name} ({o.BranchType}){o.DeliveryStatus === "Delivery" ? " ✓" : " — no delivery"}
+                </option>
+              ))}
+            </select>
+            <p>
+              📍 {sel.Name}, {sel.District}, {sel.State} — {delivers ? "yahan delivery hoti hai ✦" : "yahan delivery NAHI hoti — ✓ wala area chuno"}
+              {delivers && (<><br />Pahunchne me ~3–6 din (indicative)</>)}
+            </p>
+          </div>
+        );
+      })()}
     </div>
   );
 };
