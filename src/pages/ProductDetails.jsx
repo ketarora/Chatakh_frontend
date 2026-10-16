@@ -5,8 +5,30 @@ import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { getImageUrl } from "../utils/image";
 import { PageLoader } from "../components/Loader";
+import ProductCard from "../components/ProductCard";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"];
+
+// Smart relatedness: collection > category > subtype > price band > shared words.
+const scoreRelated = (p, base) => {
+  let s = 0;
+  if (base.mainCollection && (p.mainCollection || "").toLowerCase() === base.mainCollection.toLowerCase()) s += 3;
+  if (base.category && (p.category || "").toLowerCase() === base.category.toLowerCase()) s += 2;
+  if (base.subcategory && p.subcategory && p.subcategory.toLowerCase() === base.subcategory.toLowerCase()) s += 2;
+  if (base.price && p.price) {
+    if (Math.abs(p.price - base.price) / base.price <= 0.3) s += 1;
+  }
+  const words = `${base.name || ""} ${base.description || ""}`.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 4);
+  const hay = `${p.name || ""} ${p.description || ""}`.toLowerCase();
+  s += Math.min(2, new Set(words.filter((w) => hay.includes(w))).size);
+  return s;
+};
+
+const reasonFor = (p, base) => {
+  if (base.mainCollection && (p.mainCollection || "").toLowerCase() === base.mainCollection.toLowerCase()) return "Same collection";
+  if (base.category && (p.category || "").toLowerCase() === base.category.toLowerCase()) return "Same vibe";
+  return "Pairs well";
+};
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -24,15 +46,35 @@ const ProductDetails = () => {
   const [pinEta, setPinEta] = useState(null);
   const [failed, setFailed] = useState(false);
   const [showAdded, setShowAdded] = useState(false);
+  const [related, setRelated] = useState([]);
 
   useEffect(() => {
+    let alive = true;
     setFailed(false);
     setProduct(null);
     setImgIdx(0);
     setQty(1);
+    setRelated([]);
     api.get(`/api/products/${id}`)
-      .then((res) => setProduct(res.data))
-      .catch(() => setFailed(true));
+      .then((res) => {
+        if (!alive) return;
+        const prod = res.data;
+        setProduct(prod);
+        // Pull the catalogue once, rank by relatedness, keep top 4.
+        api.get("/api/products?limit=60").then((r) => {
+          if (!alive) return;
+          const arr = Array.isArray(r.data) ? r.data : [];
+          setRelated(
+            arr
+              .filter((p) => p._id !== prod._id)
+              .map((p) => ({ p, s: scoreRelated(p, prod), r: reasonFor(p, prod) }))
+              .sort((a, b) => b.s - a.s)
+              .slice(0, 4)
+          );
+        }).catch(() => { /* related is a bonus, never a blocker */ });
+      })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
   }, [id]);
 
   if (failed) {
@@ -183,6 +225,18 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <div className="pd-related">
+          <p className="eyebrow" style={{ textAlign: "center" }}>✦ picked for this look</p>
+          <h2>Complete the <em>look</em></h2>
+          <div className="rel-grid">
+            {related.map(({ p, r }) => (
+              <ProductCard key={p._id} product={p} tag={r} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {showAdded && (
         <div className="added-bar" role="status">

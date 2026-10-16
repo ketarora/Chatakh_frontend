@@ -3,7 +3,7 @@ import { useWishlist } from "../context/WishlistContext";
 import { getProductImage } from "../utils/image";
 import { useTilt } from "../hooks/useReveal";
 
-const ProductCard = ({ product, onQuickView }) => {
+const ProductCard = ({ product, onQuickView, tag }) => {
   const navigate = useNavigate();
   const { toggleWishlist, isWished } = useWishlist();
   const tiltRef = useTilt(7);
@@ -27,7 +27,7 @@ const ProductCard = ({ product, onQuickView }) => {
         <img src={img} alt={product.name} loading="lazy" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
         <span className="pin-shine" />
         <div className="pin-top">
-          <span className="pin-chip">{product.category || "New Drop"}</span>
+          <span className="pin-chip">{tag || product.category || "New Drop"}</span>
           <button
             className={`pin-save ${wished ? "saved" : ""}`}
             aria-label="Save to wishlist"
