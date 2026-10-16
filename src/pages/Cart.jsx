@@ -84,7 +84,7 @@ const PincodeChecker = () => {
 };
 
 const Cart = () => {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, updateQty } = useCart();
   const subtotal = cart.reduce((s, i) => s + i.price * (i.qty || 1), 0);
   const shipping = cart.reduce((s, i) => s + (i.shippingCharge || 0), 0);
 
@@ -115,8 +115,13 @@ const Cart = () => {
               <img src={getImageUrl(item.images?.[0])} alt={item.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
               <div className="cart-info">
                 <h3>{item.name}</h3>
-                <p>{item.size ? `Size ${item.size} · ` : ""}Qty {item.qty || 1}</p>
-                <b>₹{item.price * (item.qty || 1)}</b>
+                <p>{item.size ? `Size ${item.size} · ` : ""}</p>
+                <div className="qty-step">
+                  <button onClick={() => updateQty(item._id, item.size, -1)} aria-label="Decrease quantity">−</button>
+                  <b>{item.qty || 1}</b>
+                  <button onClick={() => updateQty(item._id, item.size, 1)} aria-label="Increase quantity">+</button>
+                </div>
+                <b className="cart-line-total">₹{item.price * (item.qty || 1)}</b>
               </div>
               <button onClick={() => removeFromCart(item._id, item.size)} className="cart-remove">Remove</button>
             </div>

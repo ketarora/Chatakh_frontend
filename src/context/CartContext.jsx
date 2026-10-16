@@ -46,6 +46,16 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const updateQty = (id, size, delta) => {
+    setCart((prev) =>
+      prev.map((p) =>
+        lineKey(p) === `${id}__${size || "OS"}`
+          ? { ...p, qty: Math.min(10, Math.max(1, (p.qty || 1) + delta)) }
+          : p
+      )
+    );
+  };
+
   const clearCart = () => {
     setCart([]);
     try { localStorage.removeItem("cart"); } catch { /* ignore */ }
@@ -53,7 +63,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart }}
+      value={{ cart, addToCart, removeFromCart, updateQty, clearCart }}
     >
       {children}
     </CartContext.Provider>

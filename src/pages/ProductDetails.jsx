@@ -23,6 +23,7 @@ const ProductDetails = () => {
   const [pin, setPin] = useState("");
   const [pinEta, setPinEta] = useState(null);
   const [failed, setFailed] = useState(false);
+  const [showAdded, setShowAdded] = useState(false);
 
   useEffect(() => {
     setFailed(false);
@@ -143,7 +144,7 @@ const ProductDetails = () => {
           <div className="pd-actions">
             <button
               className={`qv-primary ${added ? "done" : ""}`}
-              onClick={() => { addToCart({ ...product, size, qty }); setAdded(true); setTimeout(() => navigate("/cart"), 900); }}
+              onClick={() => { addToCart({ ...product, size, qty }); setAdded(true); setShowAdded(true); }}
             >
               {added ? "✓ Added to Bag" : "Add to Bag →"}
             </button>
@@ -182,6 +183,18 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {showAdded && (
+        <div className="added-bar" role="status">
+          <img src={getImageUrl(images[0])} alt="" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
+          <div className="added-info">
+            <b>✓ Added to bag</b>
+            <span>{product.name} · Size {size} × {qty}</span>
+          </div>
+          <button className="added-continue" onClick={() => setShowAdded(false)}>Continue shopping</button>
+          <button className="added-go" onClick={() => navigate("/cart")}>Go to Bag →</button>
+        </div>
+      )}
     </div>
   );
 };
