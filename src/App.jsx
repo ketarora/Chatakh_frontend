@@ -49,6 +49,7 @@ const App = () => {
         <AuthProvider>
           <BrowserRouter>
             {shouldUseClerk && <ClerkTokenBridge />}
+               {shouldUseClerk && <AccountSetupGate />}
             <Boot />
             <ScrollToTop />
             <Navbar />
