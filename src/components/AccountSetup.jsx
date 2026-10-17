@@ -11,7 +11,15 @@ const AccountSetup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const updatePassword = useReverification(() => user.updatePassword({ newPassword: password }));
+  const updateAccount = useReverification(async () => {
+    const nextUsername = username.trim();
+    if (user.username !== nextUsername) {
+      await user.update({ username: nextUsername });
+    }
+    if (!user.passwordEnabled) {
+      await user.updatePassword({ newPassword: password });
+    }
+  });
 
   const saveAccount = async (event) => {
     event.preventDefault();
@@ -37,12 +45,7 @@ const AccountSetup = () => {
     try {
       setError("");
       setIsSaving(true);
-      if (user.username !== nextUsername) {
-        await user.update({ username: nextUsername });
-      }
-      if (!user.passwordEnabled) {
-        await updatePassword();
-      }
+      await updateAccount();
       window.location.reload();
     } catch (saveError) {
       setError(getErrorMessage(saveError));
