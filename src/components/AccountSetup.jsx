@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth, useReverification, useUser } from "@clerk/clerk-react";
 
 const getErrorMessage = (error) =>
   error?.errors?.[0]?.longMessage || error?.errors?.[0]?.message || error?.message || "Could not finish account setup.";
@@ -11,6 +11,7 @@ const AccountSetup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const updatePassword = useReverification(() => user.updatePassword({ newPassword: password }));
 
   const saveAccount = async (event) => {
     event.preventDefault();
@@ -40,7 +41,7 @@ const AccountSetup = () => {
         await user.update({ username: nextUsername });
       }
       if (!user.passwordEnabled) {
-        await user.updatePassword({ newPassword: password });
+        await updatePassword();
       }
       window.location.reload();
     } catch (saveError) {
