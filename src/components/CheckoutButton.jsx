@@ -2,6 +2,7 @@ import api from "../api/axios";
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
 import * as Clerk from "@clerk/clerk-react";
+import { getCartShipping, getCartSubtotal } from "../utils/shipping";
 
 const useSafeAuth = () => {
   try {
@@ -16,11 +17,8 @@ const CheckoutButton = () => {
   const { getToken } = useSafeAuth();
   const { cart, clearCart } = useCart();
   
-  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.qty || 1), 0);
-  const shippingCost = cart.reduce(
-    (sum, item) => sum + (item.shippingCharge || 0),
-    0
-  );
+  const subtotal = getCartSubtotal(cart);
+  const shippingCost = getCartShipping(cart);
   const total = subtotal + shippingCost;
 const [address, setAddress] = useState({
   fullName: "",
