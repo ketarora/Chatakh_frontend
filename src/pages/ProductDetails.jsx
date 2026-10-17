@@ -6,6 +6,7 @@ import { useWishlist } from "../context/WishlistContext";
 import { getImageUrl } from "../utils/image";
 import { PageLoader } from "../components/Loader";
 import ProductCard from "../components/ProductCard";
+import { DEFAULT_SHIPPING_CHARGE, FREE_SHIPPING_THRESHOLD } from "../utils/shipping";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 
@@ -148,7 +149,7 @@ const ProductDetails = () => {
           <span className="qv-cat">{product.category || "Chatakh Edit"}</span>
           <h1>{product.name}</h1>
           <p className="pd-price">₹{product.price}</p>
-          <p className="pd-ship">{product.shippingCharge > 0 ? `+ ₹${product.shippingCharge} shipping` : "✦ Free shipping"}</p>
+          <p className="pd-ship">{product.price >= FREE_SHIPPING_THRESHOLD ? "✦ Free shipping" : `+ ₹${product.shippingCharge || DEFAULT_SHIPPING_CHARGE} shipping`}</p>
 
           <label className="pd-label">Select Size</label>
           <div className="pd-sizes">
