@@ -97,8 +97,8 @@ const Navbar = ({ onSearch }) => {
             {hasClerk ? (
               <SignedIn>
                 <span className="circle-btn static">
-                  <UserButton afterSignOutUrl="/" />
-                  <small>Hi!</small>
+                   <UserButton afterSignOutUrl="/" userProfileMode="modal" />
+                  <small>{user?.username || user?.firstName || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "Account"}</small>
                 </span>
               </SignedIn>
             ) : (
