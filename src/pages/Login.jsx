@@ -1,9 +1,27 @@
 import { Link } from "react-router-dom";
-import { SignIn } from "@clerk/clerk-react";
+import { SignIn, useAuth } from "@clerk/clerk-react";
+import { useEffect, useState } from "react";
 
 const hasClerk = Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 
+const useSafeClerkAuth = () => {
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useAuth();
+  } catch {
+    return { isLoaded: true };
+  }
+};
+
 export default function Login() {
+  const { isLoaded } = useSafeClerkAuth();
+  const [isTakingLong, setIsTakingLong] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsTakingLong(true), 8000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   if (!hasClerk) {
     return (
       <div className="cart-page">
@@ -23,6 +41,13 @@ export default function Login() {
         <img src="/logofinn.png" alt="Chatakh" className="auth-logo" />
         <h1>Welcome back, gorgeous</h1>
         <p>Sign in to track orders, save loves & checkout faster.</p>
+        <p className="auth-status" role="status">
+          {!isLoaded
+            ? "Checking your secure sign-in..."
+            : isTakingLong
+              ? "Google verification is taking longer than usual. Please keep this tab open."
+              : "Google verification may take a moment. Your account details will load after sign-in."}
+        </p>
         <SignIn
           routing="path"
           path="/login"
