@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import CheckoutButton from "../components/CheckoutButton";
 import { getImageUrl } from "../utils/image";
+import { FREE_SHIPPING_THRESHOLD, getCartShipping, getCartSubtotal } from "../utils/shipping";
 
 // Real pincode lookup (India Post, free, no key): type 6 digits →
 // pick your post office from the menu, see district + state + ETA.
@@ -85,8 +86,8 @@ const PincodeChecker = () => {
 
 const Cart = () => {
   const { cart, removeFromCart, updateQty } = useCart();
-  const subtotal = cart.reduce((s, i) => s + i.price * (i.qty || 1), 0);
-  const shipping = cart.reduce((s, i) => s + (i.shippingCharge || 0), 0);
+  const subtotal = getCartSubtotal(cart);
+  const shipping = getCartShipping(cart);
 
   if (!cart.length) {
     return (
@@ -134,12 +135,12 @@ const Cart = () => {
           <div className="sum-total"><span>Total</span><span>₹{subtotal + shipping}</span></div>
           <PincodeChecker />
           <div className="ship-progress">
-            {subtotal >= 999 ? (
+            {subtotal >= FREE_SHIPPING_THRESHOLD ? (
               <p>✦ FREE shipping unlocked!</p>
             ) : (
-              <p>₹{999 - subtotal} away from <b>FREE shipping</b></p>
+              <p>₹{FREE_SHIPPING_THRESHOLD - subtotal} away from <b>FREE shipping</b></p>
             )}
-            <div className="ship-bar"><i style={{ width: `${Math.min(100, Math.round((subtotal / 999) * 100))}%` }} /></div>
+            <div className="ship-bar"><i style={{ width: `${Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100))}%` }} /></div>
           </div>
           <CheckoutButton />
           <Link to="/collections" className="back-link">← Continue Shopping</Link>
