@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MyOrders from "./pages/MyOrders";
+import AccountSetupGate from "./components/AccountSetup";
 import { setupAxiosInterceptors } from "./api/axios";
 import "./App.css";
 
