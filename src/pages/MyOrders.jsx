@@ -180,9 +180,6 @@ const MyOrders = () => {
                   {order.paymentInfo?.razorpay_payment_id && (
                     <p className="pay-id">UPI/Card · {order.paymentInfo.razorpay_payment_id} · {order.paymentInfo.paymentMethod || "Online"}</p>
                   )}
-                  {order.paymentInfo?.paymentMethod === "COD" && (
-                    <p className="pay-id">💵 Cash on Delivery · pay at doorstep</p>
-                  )}
                 </div>
               )}
 

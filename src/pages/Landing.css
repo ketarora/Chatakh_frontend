@@ -1,0 +1,26 @@
+/* Landing.css Extensions for Wix Onsko Template Replica */
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: inline-flex;
+  will-change: transform;
+}
+
+/* Parallax Utilities */
+.mix-blend-difference {
+  mix-blend-mode: difference;
+}
+
+.mix-blend-color-burn {
+  mix-blend-mode: color-burn;
+}
+
+/* Marquee stops on hover occasionally */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

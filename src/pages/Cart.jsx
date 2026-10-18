@@ -75,7 +75,7 @@ const PincodeChecker = () => {
             </select>
             <p>
               📍 {sel.Name}, {sel.District}, {sel.State} — {delivers ? "yahan delivery hoti hai ✦" : "yahan delivery NAHI hoti — ✓ wala area chuno"}
-              {delivers && (<><br />Pahunchne me ~3–5 din (indicative)</>)}
+              {delivers && (<><br />Pahunchne me ~3–6 din (indicative)</>)}
             </p>
           </div>
         );

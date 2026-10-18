@@ -1,0 +1,124 @@
+.product-card-component {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(15, 22, 33, 0.06);
+  cursor: pointer;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.product-card-component:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(15, 22, 33, 0.1);
+}
+
+.pc-image-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #F0EBE3;
+}
+
+/* Pinterest-style varied aspect ratios */
+.ratio-a .pc-image-wrap { aspect-ratio: 3 / 4; }
+.ratio-b .pc-image-wrap { aspect-ratio: 1 / 1.25; }
+.ratio-c .pc-image-wrap { aspect-ratio: 4 / 5; }
+.ratio-a .pc-image-wrap img { object-fit: cover; }
+.ratio-b .pc-image-wrap img { object-fit: cover; }
+.ratio-c .pc-image-wrap img { object-fit: cover; }
+
+.pc-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card-component:hover .pc-image-wrap img {
+  transform: scale(1.06);
+}
+
+.pc-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 100px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #C45D3E;
+}
+
+.pc-body {
+  padding: 18px 20px 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pc-body h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.1rem;
+  color: #0F1621;
+  margin: 0 0 6px;
+  line-height: 1.3;
+}
+
+.pc-desc {
+  font-size: 0.82rem;
+  color: #8a919c;
+  line-height: 1.5;
+  margin: 0 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pc-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  margin-top: auto;
+}
+
+.pc-price {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #C45D3E;
+}
+
+.pc-status {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0F1621;
+  background: #F0EBE3;
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.pc-btn {
+  width: 100%;
+  padding: 12px;
+  background: #0F1621;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.pc-btn:hover {
+  background: #C45D3E;
+}

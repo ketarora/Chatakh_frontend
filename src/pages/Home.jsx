@@ -257,7 +257,6 @@ const CATS = [
   { value: "men", label: "Men", note: "Bandhgalas to breezy kurtas", img: "/cat-men.jpg", fallback: "/demo-2.jpg", pos: "50% 18%", to: "/collections?category=men", c: "#00aeb2" },
   { value: "women", label: "Women", note: "Lehengas, co-ords & more", img: "/cat-women.jpg", fallback: "/demo-5.jpg", pos: "50% 10%", to: "/collections?category=women", c: "#ec0080" },
   { value: "couple", label: "Couple", note: "Matchy-matchy, but make it fashion", img: "/cat-couple.jpg", fallback: "/demo-1.jpg", pos: "50% 8%", to: "/collections?category=couple", c: "#ffb300" },
-  { value: "unisex", label: "Unisex", note: "One rack, zero rules", img: "/cat-unisex.jpg", fallback: "/demo-4.jpg", pos: "50% 20%", to: "/collections?category=unisex", c: "#0ea5e9" },
   { value: "accessories", label: "Accessories", note: "The cherry on top", img: "/cat-acc.jpg", fallback: "/img2.jpeg", pos: "62% 42%", to: "/collections?category=accessories", c: "#7c3aed" },
 ];
 
@@ -295,6 +294,32 @@ const ShopByCat = () => {
               <span style={{ "--cc": c.c }} className="cat-go">Shop {c.label} →</span>
             </div>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+/* ---------------- PINTEREST WALL ---------------- */
+const Wall = ({ products, onQuickView }) => {
+  const [ref, visible] = useReveal({ threshold: 0.05 });
+  const items = useMemo(() => {
+    if (products.length > 6) return products.slice(4);
+    return FALLBACK_IMGS.concat(FALLBACK_IMGS).map((src, i) => ({ _id: `w-${i}`, name: `Muse Diaries ${i + 1}`, price: 1299 + i * 150, category: "Muses", images: [src], description: "Saved from the Chatakh moodboard." }));
+  }, [products]);
+
+  return (
+    <section ref={ref} className={`section wall reveal ${visible ? "revealed" : ""}`}>
+      <div className="sec-head">
+        <p className="eyebrow">℘ The Chatakh Wall</p>
+        <h2>Pin your <em>favourites</em></h2>
+        <p className="sec-sub">A Pinterest-style moodboard — hover any tile to save it or peek inside. It loads in a staggered cascade, just like your favourite app.</p>
+      </div>
+      <div className="masonry">
+        {items.map((p, i) => (
+          <div key={p._id + i} className="masonry-item" style={{ "--d": `${(i % 10) * 70}ms` }}>
+            <ProductCard product={p} onQuickView={onQuickView} />
+          </div>
         ))}
       </div>
     </section>
@@ -387,6 +412,12 @@ const Home = () => {
 
       {/* Explore the house: all three, equal cards */}
       <ExploreHouse />
+
+      {loading ? (
+        <section className="section"><GridSkeleton count={8} /></section>
+      ) : (
+        <Wall products={products} onQuickView={setQuickView} />
+      )}
 
       <section className="section promise">
         <div className="promise-band">

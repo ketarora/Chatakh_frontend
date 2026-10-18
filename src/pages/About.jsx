@@ -82,8 +82,7 @@ const About = () => {
       <div className="policy-grid">
         <div className="policy-card">
           <h3>🚚 Shipping</h3>
-          <p>Each of our pieces is lovingly handcrafted, which means we take our sweet time to make sure your new favorite item is absolutely perfect before it leaves our hands. Thank you for your patience and for supporting the beauty of slow craft — we promise it's worth the wait! Your special piece will be carefully packaged and on its way to you within <b>3 to 5 business days</b>.</p>
-          <p className="dim">Orders over ₹999 ship FREE — smaller ones carry a tiny shipping charge shown upfront, no surprises at payment. Tracked door-to-door across India.</p>
+          <p>Dispatched in 24–48 hrs, tracked door-to-door across India. Orders over ₹999 ship FREE — smaller ones carry a tiny shipping charge shown upfront, no surprises at payment.</p>
         </div>
         <div className="policy-card">
           <h3>🔄 Exchanges</h3>
@@ -91,7 +90,7 @@ const About = () => {
         </div>
         <div className="policy-card">
           <h3>🔒 Payments</h3>
-          <p>UPI, cards & netbanking via Razorpay's secure checkout — or Cash on Delivery, pay at your doorstep. We never see or store your card details. Ever.</p>
+          <p>UPI, cards & netbanking via Razorpay's secure checkout. We never see or store your card details. Ever.</p>
         </div>
       </div>
     </section>
