@@ -727,7 +727,10 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="flex-1">
-                      <p className="font-semibold text-slate-900 text-lg">{p.name}</p>
+                      <p className="font-semibold text-slate-900 text-lg">
+                        {p.name}
+                        {p.isNavratri && <span className="nav-flag">❀ Navratri</span>}
+                      </p>
                       <p className="text-sm text-gray-600 line-clamp-1">{p.description}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <p className="text-lg font-bold text-blue-400">₹{p.price}</p>
