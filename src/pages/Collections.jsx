@@ -18,6 +18,7 @@ const CATS = [
   { value: "men", label: "Men" },
   { value: "women", label: "Women" },
   { value: "couple", label: "Couple" },
+  { value: "unisex", label: "Unisex" },
   { value: "accessories", label: "Accessories" },
 ];
 
@@ -54,9 +55,9 @@ const Collections = () => {
     let collectionFallback = false;
     if (selected) {
       const inCollection = list.filter((p) => (p.mainCollection || "").toLowerCase() === selected.value);
-      // Never show a dead-end: if this collection has no pieces yet, show
-      // everything with a note instead of an empty page.
+      // Accessories stays empty until the backend has real accessory pieces.
       if (inCollection.length) list = inCollection;
+      else if (selected.value === "accessories") list = [];
       else collectionFallback = true;
     }
     // Navratri page shows ONLY navratri collection — nothing else, ever.
@@ -67,8 +68,7 @@ const Collections = () => {
       const matches = list.filter((p) =>
         `${p.subcategory || ""} ${p.name || ""} ${p.description || ""}`.toLowerCase().includes("accessor")
       );
-      // Never show a dead-end: if no accessories exist yet, show everything.
-      list = matches.length ? matches : list;
+      list = matches;
     } else if (categoryParam !== "all") {
       list = list.filter((p) => (p.category || "").toLowerCase() === categoryParam);
     }
@@ -111,7 +111,7 @@ const Collections = () => {
         <div className="coll-hero">
           <p className="eyebrow light">{selected ? "✦ Signature edit" : "✦ The full wardrobe"}</p>
           <h1>{selected ? selected.name : "Collections"}</h1>
-          <p>{allProducts.length} pieces · {searchParam ? `matching “${searchParam}”` : "handcrafted & ready to ship"}</p>
+          <p>{products.length} pieces · {searchParam ? `matching “${searchParam}”` : "handcrafted & ready to ship"}</p>
         </div>
       )}
 

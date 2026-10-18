@@ -49,6 +49,7 @@ const Footer = () => {
           <Link to="/collections/threads-of-aura">Threads of Aura</Link>
           <Link to="/collections/colors-of-aura">Colors of Aura</Link>
           <Link to="/navratri">Navratri Edit ❀</Link>
+          <a className="f-mail" href="mailto:support@chatakh.com">support@chatakh.com</a>
         </div>
 
         <div className="f-col">
@@ -57,7 +58,6 @@ const Footer = () => {
           <Link to="/wishlist">Wishlist</Link>
           <Link to="/my-orders">My Orders</Link>
           <Link to="/about#policies">Shipping & Exchanges</Link>
-          <a href="mailto:support@chatakh.com">support@chatakh.com</a>
         </div>
 
         <div className="f-news">

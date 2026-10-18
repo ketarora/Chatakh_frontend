@@ -67,6 +67,12 @@ const AdminDashboard = () => {
       { value: "couple-outfits", label: "Couple Outfits" },
       { value: "accessories", label: "Accessories" },
     ],
+    unisex: [
+      { value: "tshirts", label: "T-Shirts" },
+      { value: "shirts", label: "Shirts" },
+      { value: "hoodies", label: "Hoodies" },
+      { value: "accessories", label: "Accessories" },
+    ],
   };
 
   // Setup interceptor when getToken is available
@@ -453,6 +459,7 @@ const AdminDashboard = () => {
               <option value="men">Men</option>
               <option value="women">Women</option>
               <option value="couple">Couple</option>
+              <option value="unisex">Unisex</option>
             </select>
             {form.category && (
               <select
@@ -579,6 +586,7 @@ const AdminDashboard = () => {
                 <option value="men">Men</option>
                 <option value="women">Women</option>
                 <option value="couple">Couple</option>
+              <option value="unisex">Unisex</option>
               </select>
               {form.category && (
                 <select

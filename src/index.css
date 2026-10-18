@@ -1,9 +1,0 @@
-@import "tailwindcss";
-
-* { -webkit-tap-highlight-color: transparent; }
-html { scroll-behavior: smooth; }
-body { margin: 0; padding: 0; overflow-x: hidden; }
-#root { width: 100%; overflow-x: hidden; }
-a { text-decoration: none; }
-button { font-family: inherit; }
-input, textarea, select { font-size: 16px; font-family: inherit; }
