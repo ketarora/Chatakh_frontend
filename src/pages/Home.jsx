@@ -85,6 +85,7 @@ const Featured = ({ products, link, onQuickView }) => {
   const [paused, setPaused] = useState(false);
   const [resumeAt, setResumeAt] = useState(0);
   const touchStart = useRef(null);
+  const canHover = useRef(typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches);
   const [ref, visible] = useReveal();
   const list = products.length ? products : FALLBACK_IMGS.map((src, i) => ({ _id: `fb-${i}`, name: `Chatakh Muse ${i + 1}`, price: 1499 + i * 200, category: "Featured", images: [src], description: "Festive statement from the house of Chatakh." }));
   const len = list.length;
@@ -115,10 +116,10 @@ const Featured = ({ products, link, onQuickView }) => {
     if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) nudge(dx < 0 ? 1 : -1);
   };
 
-  // rotate: 3 visible, offset shifts each tick
-  const visible3 = [0, 1, 2].map((k) => list[(tick + k) % len]);
+  // rotate: 3 visible; CENTER card = tick so serial & active dot always match
+  const visible3 = [-1, 0, 1].map((k) => ({ pos: k + 1, idx: (tick + k + len) % len }));
   const activeName = list[tick % len]?.name || "Featured";
-  const dotCount = Math.min(6, len);
+  const dotCount = len;
 
   return (
     <section id="featured" ref={ref} className={`section featured reveal ${visible ? "revealed" : ""}`}>
@@ -130,29 +131,32 @@ const Featured = ({ products, link, onQuickView }) => {
 
       <div
         className="feat-stage"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        onMouseEnter={() => { if (canHover.current) setPaused(true); }}
+        onMouseLeave={() => { if (canHover.current) setPaused(false); }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        {visible3.map((p, i) => (
-          <div
-            key={`${p._id}-${i}`}
-            className={`feat-card pos-${i}`}
-            role="button"
-            tabIndex={0}
-            aria-label={`Quick view ${p.name}`}
-            onClick={() => onQuickView?.(p)}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onQuickView?.(p); } }}
-          >
-            <img src={getImageUrl(p.images?.[0])} alt={p.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
-            <span className="feat-num">{String(((tick + i) % len) + 1).padStart(2, "0")}</span>
-            <div className="feat-cap">
-              <b>{p.name}</b>
-              <span>₹{p.price}</span>
+        {visible3.map(({ pos, idx }) => {
+          const p = list[idx];
+          return (
+            <div
+              key={`${p._id}-${pos}`}
+              className={`feat-card pos-${pos}`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Quick view ${p.name}`}
+              onClick={() => onQuickView?.(p)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onQuickView?.(p); } }}
+            >
+              <img src={getImageUrl(p.images?.[0])} alt={p.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "/img1.jpeg"; }} />
+              <span className="feat-num">{String(idx + 1).padStart(2, "0")}</span>
+              <div className="feat-cap">
+                <b>{p.name}</b>
+                <span>₹{p.price}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <button className="feat-arrow l" aria-label="Previous look" onClick={() => nudge(-1)}>‹</button>
         <button className="feat-arrow r" aria-label="Next look" onClick={() => nudge(1)}>›</button>
         <div className="feat-dots" role="tablist" aria-label="Featured looks">
