@@ -288,18 +288,18 @@ img { user-select: none; }
 }
 
 /* ============ WALL: uniform grid, tidy rows, staggered entrance ============ */
-.masonry { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.masonry { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
 .masonry.pad { padding: 10px 24px 40px; max-width: 1240px; margin: 0 auto; }
-.masonry-item { animation: pinIn .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0ms); }
-@media (max-width: 1100px) { .masonry { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 820px) { .masonry { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .masonry { grid-template-columns: 1fr 1fr; gap: 12px; } }
+.masonry-item { animation: pinIn .6s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, 0ms); min-width: 0; }
+@media (max-width: 1100px) { .masonry { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 820px) { .masonry { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .masonry { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
 .grid4.pad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 10px 24px 40px; max-width: 1240px; margin: 0 auto; }
 @media (max-width: 1000px) { .grid4.pad { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .grid4.pad { grid-template-columns: 1fr; } }
 
 /* ============ PIN CARD ============ */
-.pin-card { background: #fff; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); cursor: pointer; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; will-change: transform; }
+.pin-card { background: #fff; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); cursor: pointer; transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; will-change: transform; min-width: 0; }
 .pin-card:hover { box-shadow: var(--shadow); }
 .pin-media { position: relative; overflow: hidden; background: var(--cream-2); aspect-ratio: 3 / 4; }
 .pin-card .pin-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .55s cubic-bezier(.2,.8,.2,1); }
