@@ -69,6 +69,7 @@ const Navbar = ({ onSearch }) => {
             <NavLink to="/" className={linkCls}>Home</NavLink>
             <NavLink to="/about" className={linkCls}>About</NavLink>
             <NavLink to="/collections" className={linkCls}>Collections</NavLink>
+            <NavLink to="/navratri" className={linkCls}>Navratri ❀</NavLink>
           </div>
 
           <form className={`pill-search ${searchOpen ? "open" : ""}`} onSubmit={submitSearch}>
@@ -97,7 +98,7 @@ const Navbar = ({ onSearch }) => {
             {hasClerk ? (
               <SignedIn>
                 <span className="circle-btn static">
-                   <UserButton afterSignOutUrl="/" userProfileMode="modal" />
+                  <UserButton afterSignOutUrl="/" userProfileMode="modal" />
                   <small>{user?.username || user?.firstName || user?.primaryEmailAddress?.emailAddress?.split("@")[0] || "Account"}</small>
                 </span>
               </SignedIn>
@@ -128,6 +129,7 @@ const Navbar = ({ onSearch }) => {
           <NavLink to="/" className={linkCls}>Home</NavLink>
           <NavLink to="/about" className={linkCls}>About</NavLink>
           <NavLink to="/collections" className={linkCls}>Collections</NavLink>
+          <NavLink to="/navratri" className={linkCls}>Navratri ❀</NavLink>
           <NavLink to="/wishlist" className={linkCls}>Wishlist ({count})</NavLink>
           <NavLink to="/cart" className={linkCls}>Cart ({cart.length})</NavLink>
           <NavLink to="/my-orders" className={linkCls}>My Orders</NavLink>

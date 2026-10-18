@@ -35,6 +35,7 @@ const AdminDashboard = () => {
     mainCollection: "",
     category: "",
     subcategory: "",
+    isNavratri: false,
   });
 
   const mainCollectionOptions = [
@@ -256,6 +257,7 @@ const AdminDashboard = () => {
         mainCollection: "",
         category: "",
         subcategory: "",
+        isNavratri: false,
       });
       setImages([]);
     } catch (err) {
@@ -276,6 +278,7 @@ const AdminDashboard = () => {
       mainCollection: p.mainCollection || "",
       category: p.category,
       subcategory: p.subcategory || "",
+      isNavratri: Boolean(p.isNavratri),
     });
     setImages(p.images || []);
   };
@@ -309,6 +312,7 @@ const AdminDashboard = () => {
         mainCollection: "",
         category: "",
         subcategory: "",
+        isNavratri: false,
       });
       setImages([]);
       await fetchAdminData();
@@ -475,6 +479,14 @@ const AdminDashboard = () => {
                 ))}
               </select>
             )}
+            <label className="nav-toggle">
+              <input
+                type="checkbox"
+                checked={Boolean(form.isNavratri)}
+                onChange={(e) => setForm({ ...form, isNavratri: e.target.checked })}
+              />
+              <span>❀ Show in Navratri Edit page too (keeps its own collection)</span>
+            </label>
           </div>
 
           <textarea
@@ -602,6 +614,14 @@ const AdminDashboard = () => {
                   ))}
                 </select>
               )}
+              <label className="nav-toggle">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form.isNavratri)}
+                  onChange={(e) => setForm({ ...form, isNavratri: e.target.checked })}
+                />
+                <span>❀ Show in Navratri Edit page too (keeps its own collection)</span>
+              </label>
             </div>
 
             <textarea
@@ -670,6 +690,7 @@ const AdminDashboard = () => {
                     mainCollection: "",
                     category: "",
                     subcategory: "",
+                    isNavratri: false,
                   });
                   setImages([]);
                 }}

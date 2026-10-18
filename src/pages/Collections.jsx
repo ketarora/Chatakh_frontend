@@ -60,9 +60,9 @@ const Collections = () => {
       else if (selected.value === "accessories") list = [];
       else collectionFallback = true;
     }
-    // Navratri page shows ONLY navratri collection — nothing else, ever.
+    // Navratri page shows flagged products + legacy navratri-collection ones.
     if (isNavratriPage) {
-      list = list.filter((p) => (p.mainCollection || "").toLowerCase() === "navratri");
+      list = list.filter((p) => p.isNavratri === true || (p.mainCollection || "").toLowerCase() === "navratri");
     }
     if (categoryParam === "accessories") {
       const matches = list.filter((p) =>

@@ -359,7 +359,7 @@ const Home = () => {
     const slug = (v) => (v || "").toString().toLowerCase().replace(/^the[\s-]+/, "").replace(/[\s_]+/g, "-").trim();
     const by = (s) => products.filter((p) => slug(p.mainCollection) === s);
     const notThreads = (p) => slug(p.mainCollection) !== "threads-of-aura";
-    const nav = by("navratri");
+    const nav = products.filter((p) => p.isNavratri === true || slug(p.mainCollection) === "navratri");
     if (nav.length) return { items: nav.slice(0, 8), to: "/navratri" };
     const colors = by("colors-of-aura");
     if (colors.length) return { items: colors.slice(0, 8), to: "/collections/colors-of-aura" };
