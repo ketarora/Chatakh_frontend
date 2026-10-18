@@ -8,6 +8,11 @@ export const getImageUrl = (imagePath) => {
   let p = imagePath.trim();
   if (!p) return PLACEHOLDER;
   if (p.startsWith("http://") || p.startsWith("https://") || p.startsWith("data:") || p.startsWith("blob:")) {
+    // Cloudinary assets: let the CDN serve auto format + quality at a
+    // sensible width so phone-sized originals never slow the store down.
+    if (p.includes("res.cloudinary.com") && p.includes("/upload/") && !p.includes("/upload/f_")) {
+      return p.replace("/upload/", "/upload/f_auto,q_auto,w_1200/");
+    }
     return p;
   }
   // normalise windows separators + collapse duplicates
