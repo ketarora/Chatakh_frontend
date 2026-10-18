@@ -151,6 +151,10 @@ img { user-select: none; }
 .feat-dots { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
 .feat-dots button { width: 8px; height: 8px; border-radius: 999px; background: #EAC9B8; transition: .3s; border: 0; padding: 0; cursor: pointer; }
 .feat-dots button.on { width: 28px; background: var(--pink); }
+.feat-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 6; width: 42px; height: 42px; border-radius: 999px; background: rgba(255,255,255,.94); border: 2px solid var(--pink); color: var(--pink-deep); font-size: 22px; font-weight: 800; line-height: 1; cursor: pointer; box-shadow: var(--shadow); display: grid; place-items: center; padding: 0; transition: .25s; }
+.feat-arrow:hover { background: var(--pink); color: #fff; transform: translateY(-50%) scale(1.08); }
+.feat-arrow.l { left: -10px; }
+.feat-arrow.r { right: -10px; }
 .feat-pill-row { text-align: center; margin-top: 52px; }
 .feat-pill { display: inline-block; background: #fff; border: 2px solid var(--pink); color: var(--pink-deep); font-weight: 700; padding: 13px 34px; border-radius: 999px; text-decoration: none; transition: .28s; box-shadow: var(--shadow); }
 .feat-pill:hover { background: var(--pink); color: #fff; transform: translateY(-2px); }
@@ -794,6 +798,9 @@ html, body { max-width: 100%; overflow-x: clip; }
   .feat-card.pos-0, .feat-card.pos-2 { display: none; }
   .feat-card.pos-1 { display: block; width: min(100%, 340px); height: 430px; transform: none; margin: 0 auto; }
   .feat-dots { bottom: -26px; }
+  .feat-arrow { width: 40px; height: 40px; font-size: 20px; }
+  .feat-arrow.l { left: 2px; }
+  .feat-arrow.r { right: 2px; }
   .feat-pill-row { margin-top: 48px; }
   .feat-pill { max-width: 100%; box-sizing: border-box; padding: 12px 22px; }
 }
