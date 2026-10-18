@@ -204,7 +204,7 @@ const ProductDetails = () => {
                 e.preventDefault();
                 if (!/^\d{6}$/.test(pin.trim())) { setPinEta({ error: "Enter a valid 6-digit pincode" }); return; }
                 const fmt = (t) => new Date(t).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-                setPinEta({ ok: `Reaches ${pin.trim()} by ${fmt(Date.now() + 4 * 864e5)} – ${fmt(Date.now() + 6 * 864e5)} (indicative)` });
+                  setPinEta({ ok: `Reaches ${pin.trim()} by ${fmt(Date.now() + 3 * 864e5)} – ${fmt(Date.now() + 5 * 864e5)} (indicative)` });
               }}
             >
               <input

@@ -30,24 +30,73 @@ const [address, setAddress] = useState({
 });
 const [isLoading, setIsLoading] = useState(false);
 const [error, setError] = useState(null);
+const [method, setMethod] = useState("online"); // "online" | "cod"
 
+  const validateAddress = () => {
+    if (!address.fullName || !address.address || !address.city || !address.state || !address.pincode || !address.phone) {
+      setError("Please fill all address fields");
+      return false;
+    }
+    if (!/^[6-9]\d{9}$/.test(address.phone.trim())) {
+      setError("Enter a valid 10-digit mobile number (starting 6–9)");
+      return false;
+    }
+    if (!/^\d{6}$/.test(address.pincode.trim())) {
+      setError("Enter a valid 6-digit pincode");
+      return false;
+    }
+    return true;
+  };
+
+  const requireLogin = async () => {
+    const sessionToken = await getToken().catch(() => null);
+    if (!sessionToken) {
+      setError("Please login to place your order — your bag is saved, sign in and hit the button again →");
+      setIsLoading(false);
+      return null;
+    }
+    return sessionToken;
+  };
+
+  const placeCodOrder = async () => {
+    try {
+      setError(null);
+      if (!validateAddress()) return;
+      setIsLoading(true);
+      const sessionToken = await requireLogin();
+      if (!sessionToken) return;
+
+      await api.post("/api/orders", {
+        items: cart.map((item) => ({
+          productId: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: item.qty || 1,
+          size: item.size,
+        })),
+        subtotal,
+        shippingCost,
+        totalAmount: total,
+        shippingAddress: address,
+        paymentInfo: { paymentMethod: "COD" },
+        paymentStatus: "Pending",
+        orderStatus: "Placed",
+      });
+
+      clearCart();
+      window.location.href = "/my-orders";
+    } catch (err) {
+      console.error("❌ COD order error:", err);
+      setError("Could not place order: " + (err.response?.data?.message || err.message));
+      setIsLoading(false);
+    }
+  };
 
   const payNow = async () => {
     try {
       setError(null);
       // Validate address
-      if (!address.fullName || !address.address || !address.city || !address.state || !address.pincode || !address.phone) {
-        setError("Please fill all address fields");
-        return;
-      }
-      if (!/^[6-9]\d{9}$/.test(address.phone.trim())) {
-        setError("Enter a valid 10-digit mobile number (starting 6–9)");
-        return;
-      }
-      if (!/^\d{6}$/.test(address.pincode.trim())) {
-        setError("Enter a valid 6-digit pincode");
-        return;
-      }
+      if (!validateAddress()) return;
 
       setIsLoading(true);
       console.log("💳 Initiating payment for amount:", total);
@@ -55,12 +104,8 @@ const [error, setError] = useState(null);
       // Auth gate: backend records the order against your login. Without a
       // session token it answers 401 "Not authenticated" — catch it here
       // with a human message instead of a cryptic error.
-      const sessionToken = await getToken().catch(() => null);
-      if (!sessionToken) {
-        setError("Please login to pay — your bag is saved, sign in and hit Pay again →");
-        setIsLoading(false);
-        return;
-      }
+      const sessionToken = await requireLogin();
+      if (!sessionToken) return;
 
       // Use interceptor - no need to pass token manually
       const { data } = await api.post("/api/payment/create", { amount: total });
@@ -222,8 +267,20 @@ const [error, setError] = useState(null);
         </div>
       )}
 
+      <div className="pay-methods">
+        <button type="button" className={`pm-chip ${method === "online" ? "on" : ""}`} onClick={() => setMethod("online")}>
+          💳 Pay Online
+        </button>
+        <button type="button" className={`pm-chip ${method === "cod" ? "on" : ""}`} onClick={() => setMethod("cod")}>
+          💵 Cash on Delivery
+        </button>
+      </div>
+      {method === "cod" && (
+        <p className="cod-note">Pay in cash when your order reaches you. No advance needed.</p>
+      )}
+
       <button 
-        onClick={payNow}
+        onClick={method === "cod" ? placeCodOrder : payNow}
         disabled={isLoading}
         className={`w-full ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'} text-white py-4 rounded-xl font-semibold shadow-lg shadow-blue-400/50 hover:shadow-xl transition-all duration-300 transform ${isLoading ? '' : 'hover:scale-105'}`}
       >
@@ -236,7 +293,7 @@ const [error, setError] = useState(null);
             Processing...
           </span>
         ) : (
-          `Pay ₹${total}`
+          method === "cod" ? `Place Order · COD ₹${total}` : `Pay ₹${total}`
         )}
       </button>
     </div>
